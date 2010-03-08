@@ -1,0 +1,8 @@
+Package: libharfbuzz
+Version: 0.1
+Architecture: armel
+Maintainer: prameet <prameet.k@partner.samsung.coms>
+Installed-Size: 304
+Section: libs
+Priority: optional
+Description: Hindi reshaping library

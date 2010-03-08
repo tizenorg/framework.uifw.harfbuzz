@@ -1,0 +1,18 @@
+Source: libharfbuzz
+Section: libs
+Priority: optional
+Maintainer: prameet <prameet.k@partner.samsung.coms>
+Build-Depends: debhelper (>= 5),libfreetype6-dev,autotools-dev, libelm-dev, libslp-utilx-dev, libslp-applog-dev, libui-indicator-dev, libslp-appfwk-dev, libisf-dev,libslp-setting-dev,libslp-util-dev
+Standards-Version: 3.7.2
+
+Package: libharfbuzz
+Architecture: any
+Depends: 
+Description: Hindi reshaping library
+
+Package: libharfbuzz-dbg
+Section: debug
+Architecture: any
+Depends:
+Description: Hindi reshaping library (unstripped)
+

@@ -1,0 +1,9 @@
+Package: libharfbuzz-dbg
+Source: libharfbuzz
+Version: 0.1
+Architecture: armel
+Maintainer: prameet <prameet.k@partner.samsung.coms>
+Installed-Size: 52
+Section: debug
+Priority: optional
+Description: Hindi reshaping library (unstripped)
