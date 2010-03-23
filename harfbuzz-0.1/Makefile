@@ -26,6 +26,8 @@ all: library
 install:
 	mkdir -p debian/tmp/usr/lib
 	mv $(TARGET) debian/tmp/usr/lib
+	mkdir -p debian/tmp/usr/include/harfbuzz
+	cp include/* debian/tmp/usr/include/harfbuzz
 
 clean:
 	rm -rf *.o *.so
