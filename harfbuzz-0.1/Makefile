@@ -28,6 +28,11 @@ install:
 	mv $(TARGET) debian/tmp/usr/lib
 	mkdir -p debian/tmp/usr/include/harfbuzz
 	cp include/* debian/tmp/usr/include/harfbuzz
+	mkdir -p debian/tmp/usr/lib/pkgconfig/
+	cp harfbuzz.pc debian/tmp/usr/lib/pkgconfig/
 
 clean:
 	rm -rf *.o *.so
+	rm -rf debian/libharfbuzz-dev/
+	rm -rf debian/libharfbuzz/
+	rm -rf debian/tmp/
