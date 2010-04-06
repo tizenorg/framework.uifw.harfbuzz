@@ -1,9 +1,10 @@
 Package: libharfbuzz-dbg
-Source: libharfbuzz
-Version: 0.1
+Source: harfbuzz
+Version: 0.4.0-1slp2+3
 Architecture: armel
-Maintainer: prameet <prameet.k@partner.samsung.coms>
+Maintainer: janani <janani.k@samsung.com>
 Installed-Size: 52
+Depends: libharfbuzz (= 0.4.0-1slp2+3)
 Section: debug
 Priority: optional
 Description: Hindi reshaping library (unstripped)

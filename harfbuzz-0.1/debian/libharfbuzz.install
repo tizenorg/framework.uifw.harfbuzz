@@ -1,2 +1,3 @@
 usr/lib/libharfbuzz.so
-usr/include/harfbuzz/*
+usr/include/*
+usr/lib/pkgconfig/*

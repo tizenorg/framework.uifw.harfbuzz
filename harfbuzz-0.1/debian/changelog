@@ -1,5 +1,35 @@
-libharfbuzz (0.1) unstable; urgency=low
+harfbuzz (0.4.0-1slp2+3) unstable; urgency=low
+
+  * Modified makefile and install file
+
+ -- Janani <janani.k@samsung.com>  Tue, 06 Apr 2010 13:11:30 +0530
+
+harfbuzz (0.4.0-1slp2+2) unstable; urgency=low
+
+  * Package name changed 
+
+ -- Janani <janani.k@samsung.com>  Fri, 26 Mar 2010 14:18:04 +0530
+
+harfbuzz (0.4.0-1slp2+1) unstable; urgency=low
+
+  * Repackaging
+
+ -- Janani <janani.k@samsung.com>  Fri, 26 Mar 2010 10:14:37 +0530
+
+harfbuzz (0.3) unstable; urgency=low
+
+  * Email ID corrected
+
+ -- Janani <janani.k@samsung.com>  Wed, 17 Mar 2010 16:00:07 +0530
+
+harfbuzz (0.2) unstable; urgency=low
+
+  * Owner Changed
+
+ -- Janani <janani.k@samsung.com>  Mon, 15 Mar 2010 16:57:26 +0530
+
+harfbuzz (0.1) unstable; urgency=low
 
   * Initial Release.
 
- -- prameet <prameet.k@partner.samsung.com>  Fri, 05 Mar 2010 10:49:10 +0530
+ -- Janani <janani.k@samsung.com>  Fri, 05 Mar 2010 10:49:10 +0530
