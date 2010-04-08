@@ -1,9 +1,9 @@
 Package: libharfbuzz
 Source: harfbuzz
-Version: 0.4.0-1slp2+3
+Version: 0.4.0-1slp2+4
 Architecture: armel
 Maintainer: janani <janani.k@samsung.com>
-Installed-Size: 544
+Installed-Size: 536
 Section: libs
 Priority: optional
 Description: Hindi Reshaping Library

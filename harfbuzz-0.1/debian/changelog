@@ -1,3 +1,15 @@
+harfbuzz (0.4.0-1slp2+5) unstable; urgency=low
+
+  * Removed DOS style line endings 
+
+ -- Janani <janani.k@samsung.com>  Thu, 08 Apr 2010 10:53:45 +0530
+
+harfbuzz (0.4.0-1slp2+4) unstable; urgency=low
+
+  * Minor changes 
+
+ -- Janani <janani.k@samsung.com>  Tue, 06 Apr 2010 13:14:09 +0530
+
 harfbuzz (0.4.0-1slp2+3) unstable; urgency=low
 
   * Modified makefile and install file
