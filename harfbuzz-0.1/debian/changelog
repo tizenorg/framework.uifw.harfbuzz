@@ -1,3 +1,15 @@
+harfbuzz (0.4.0-1slp2+7) unstable; urgency=low
+
+  * Change maintainer according to the policy
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Wed, 21 Apr 2010 10:00:53 +0900
+
+harfbuzz (0.4.0-1slp2+6) unstable; urgency=high
+
+  * Modified the control file
+
+ -- Janani <janani.k@samsung.com>  Thu, 08 Apr 2010 15:14:53 +0530
+
 harfbuzz (0.4.0-1slp2+5) unstable; urgency=low
 
   * Removed DOS style line endings 
