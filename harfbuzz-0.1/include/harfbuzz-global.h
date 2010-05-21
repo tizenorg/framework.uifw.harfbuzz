@@ -1,4 +1,7 @@
 /*
+ * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ * Copyright (C) 2007  Red Hat, Inc.
+ *
  * This is part of HarfBuzz, an OpenType Layout engine library.
  *
  * Permission is hereby granted, without written agreement and without

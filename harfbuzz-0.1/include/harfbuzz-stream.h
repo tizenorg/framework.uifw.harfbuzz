@@ -1,4 +1,7 @@
 /*
+ * Copyright (C) 2005  David Turner
+ * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ *
  * This is part of HarfBuzz, an OpenType Layout engine library.
  *
  * Permission is hereby granted, without written agreement and without
