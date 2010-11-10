@@ -1,7 +1,7 @@
 Source: harfbuzz
 Section: libs
 Priority: optional
-Maintainer: Jihoon Kim <jihoon48.kim@samsung.com>, janani <janani.k@samsung.com>, Sehwan Park <sehwan@samsung.com>, prameet.k <prameet.k@partner.samsung.com>
+Maintainer: janani <janani.k@samsung.com>, prameet.k <prameet.k@partner.samsung.com>, Jihoon Kim <jihoon48.kim@samsung.com>, Sehwan Park <sehwan@samsung.com>
 Build-Depends: debhelper (>= 5),libfreetype6-dev, pkg-config
 Standards-Version: 3.7.2
 
