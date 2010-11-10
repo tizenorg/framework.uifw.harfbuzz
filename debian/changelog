@@ -1,3 +1,11 @@
+harfbuzz (0.4.0-1slp2+9) unstable; urgency=low
+
+  * Add git tag
+  * Git: 165.213.180.234:/git/slp/pkgs/harfbuzz
+  * Tag: harfbuzz_0.4.0-1slp2+9
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Wed, 10 Nov 2010 11:30:49 +0900
+
 harfbuzz (0.4.0-1slp2+8) unstable; urgency=low
 
   * Added maintainer according to policy
