@@ -1,3 +1,11 @@
+harfbuzz (0.4.0-1slp2+12) unstable; urgency=low
+
+  * Modify git repository path
+  * Git: 165.213.180.234:slp/pkgs/h/harfbuzz
+  * Tag: harfbuzz_0.4.0-1slp2+12
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Mon, 20 Dec 2010 13:45:30 +0900
+
 harfbuzz (0.4.0-1slp2+11) unstable; urgency=low
 
   * Change FPIC to fPIC
