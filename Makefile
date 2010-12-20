@@ -2,7 +2,7 @@
 CC=gcc
 INCLUDE=-I ./include -I /usr/include/freetype2/ -I /usr/include/freetype2/freetype/ -I /usr/include/freetype2/freetype/config/
 
-OPTIONS=-g -FPIC 
+OPTIONS=-g -fPIC 
 
 MAINSOURCES =  \
 	src/harfbuzz-dump.c \
