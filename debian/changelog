@@ -4,8 +4,7 @@ harfbuzz (0.4.0-1slp2+13) unstable; urgency=low
   * Git: 165.213.180.234:slp/pkgs/h/harfbuzz
   * Tag: harfbuzz_0.4.0-1slp2+13
 
- -- Tom Hacohen <tom.hacohen@partner.samsung.com>  Tue, 04 Jan 2011 16:45:04
- +0200
+ -- Tom Hacohen <tom.hacohen@partner.samsung.com>  Tue, 04 Jan 2011 16:45:04 +0200
 
 harfbuzz (0.4.0-1slp2+12) unstable; urgency=low
 
