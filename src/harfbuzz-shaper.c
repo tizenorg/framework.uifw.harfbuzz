@@ -466,7 +466,7 @@ void HB_HeuristicSetGlyphAttributes(HB_ShaperItem *item)
     attributes[0].dontPrint = (!symbolFont && uc[0] == 0x00ad) || HB_IsControlChar(uc[0]);
 
     int pos = 0;
-    HB_CharCategory lastCat;
+    HB_CharCategory lastCat = HB_NoCategory;
     int dummy;
     HB_GetUnicodeCharProperties(uc[0], &lastCat, &dummy);
     for (i = 1; i < length; ++i) {
@@ -481,8 +481,8 @@ void HB_HeuristicSetGlyphAttributes(HB_ShaperItem *item)
         // hide soft-hyphens by default
         if ((!symbolFont && uc[i] == 0x00ad) || HB_IsControlChar(uc[i]))
             attributes[pos].dontPrint = true;
-        HB_CharCategory cat;
-        int cmb;
+        HB_CharCategory cat = HB_NoCategory;
+        int cmb = 0;
         HB_GetUnicodeCharProperties(uc[i], &cat, &cmb);
         if (cat != HB_Mark_NonSpacing) {
             attributes[pos].mark = false;
