@@ -1,3 +1,12 @@
+harfbuzz (0.4.1-1slp2+1) unstable; urgency=low
+
+  * Fixed an issue with uninitialized values
+  * Fixed an issue with log clusters not updated correctly.
+  * Git: 165.213.180.234:slp/pkgs/h/harfbuzz
+  * Tag: harfbuzz_0.4.1-1slp2+1
+
+ -- Tom Hacohen <tom.hacohen@partner.samsung.com>  Tue, 18 Jan 2011 16:00:38 +0900
+
 harfbuzz (0.4.0-1slp2+13) unstable; urgency=low
 
   * Fixed version number in the .pc file
