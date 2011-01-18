@@ -1842,13 +1842,11 @@ HB_Bool HB_IndicShape(HB_ShaperItem *item)
         IDEBUG("syllable:");
         hb_uint32 g;
         for (g = first_glyph; g < first_glyph + syllable.num_glyphs; ++g)
+          {
             IDEBUG("        %d -> glyph %x", g, item->glyphs[g]);
-        IDEBUG("    logclusters:");
-        int i;
-        for (i = sstart; i < send; ++i) {
-            IDEBUG("        %d -> glyph %d", i, first_glyph);
-            logClusters[i-item->item.pos] = first_glyph;
-        }
+            IDEBUG("          -> cluster %d", syllable.item.pos);
+            logClusters[g] = syllable.item.pos;
+          }
         sstart = send;
         first_glyph += syllable.num_glyphs;
     }
