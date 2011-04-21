@@ -20,5 +20,5 @@ Description: Hindi reshaping library (unstripped)
 Package: libharfbuzz-dbg
 Section: debug
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libharfbuzz (= ${Source-Version})
+Depends: ${misc:Depends}, libharfbuzz (= ${Source-Version})
 Description: Hindi reshaping library (unstripped)
