@@ -10,3 +10,11 @@ packages
 binaries
 *.ipk
 *~
+build-stamp
+debian/files
+debian/*.substvars
+debian/libharfbuzz-dbg/
+debian/libharfbuzz-dev/
+debian/libharfbuzz/
+config.guess
+config.sub
