@@ -18,3 +18,8 @@ debian/libharfbuzz-dev/
 debian/libharfbuzz/
 config.guess
 config.sub
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+libharfbuzz.so
