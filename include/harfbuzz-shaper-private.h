@@ -146,7 +146,7 @@ HB_Bool HB_ConvertStringToGlyphIndices(HB_ShaperItem *shaper_item);
                                                shaper_item->face->current_flags);
 
 #define HB_DECLARE_STACKARRAY(Type, Name) \
-    Type stack##Name[64]; \ 
+    Type stack##Name[64]; \
     Type *Name = stack##Name;
 
 #define HB_INIT_STACKARRAY(Type, Name, Length) \
