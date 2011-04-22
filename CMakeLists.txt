@@ -4,7 +4,7 @@ SET(VERSION_MAJOR 0)
 SET(VERSION "${VERSION_MAJOR}.0.1")
 
 INCLUDE(FindPkgConfig)
-pkg_check_modules(pkgs REQUIRED libxml-2.0)
+pkg_check_modules(pkgs REQUIRED )
 
 SET(SRCS
 	src/harfbuzz-dump.c
