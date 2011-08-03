@@ -1,3 +1,9 @@
+harfbuzz (0.7.0-1slp2+1) unstable; urgency=low
+
+  * Upgrade to latest harfbuzz
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Wed, 03 Aug 2011 17:42:58 +0900
+
 harfbuzz (0.4.1-1slp2+2) unstable; urgency=low
 
   * Move headers to dev package
