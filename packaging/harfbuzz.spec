@@ -36,7 +36,9 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 %make_install
 
+%post -p /sbin/ldconfig
 
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root,-)
