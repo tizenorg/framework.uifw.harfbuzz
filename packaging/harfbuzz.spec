@@ -5,6 +5,7 @@ Release:        1
 Group:          TO_BE/FILLED_IN
 License:        TO BE FILLED IN
 Source0:        %{name}-%{version}.tar.gz
+Source1001: packaging/harfbuzz.manifest 
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  which
 BuildRequires:  ragel
@@ -28,6 +29,7 @@ Development files for %{name}
 
 
 %build
+cp %{SOURCE1001} .
 %autogen
 %configure
 
@@ -42,10 +44,12 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %files
+%manifest harfbuzz.manifest
 %defattr(-,root,root,-)
 %{_libdir}/lib*.so.*
 
 %files devel
+%manifest harfbuzz.manifest
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/lib*.so
