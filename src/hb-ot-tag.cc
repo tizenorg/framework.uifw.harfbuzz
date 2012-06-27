@@ -31,7 +31,6 @@
 
 #include <string.h>
 
-HB_BEGIN_DECLS
 
 
 /* hb_script_t */
@@ -652,6 +651,14 @@ hb_ot_tag_from_language (hb_language_t language)
     return HB_TAG('Z','H','S',' ');
   }
 
+  s = strchr (lang_str, '-');
+  if (!s)
+    s = lang_str + strlen (lang_str);
+  if (s - lang_str == 3) {
+    /* Assume it's ISO-639-3 and upper-case and use it. */
+    return hb_tag_from_string (lang_str, s - lang_str) & ~0x20202000;
+  }
+
   return HB_OT_TAG_DEFAULT_LANGUAGE;
 }
 
@@ -665,12 +672,12 @@ hb_ot_tag_to_language (hb_tag_t tag)
 
   for (i = 0; i < ARRAY_LENGTH (ot_languages); i++)
     if (ot_languages[i].tag == tag)
-      return hb_language_from_string (ot_languages[i].language);
+      return hb_language_from_string (ot_languages[i].language, -1);
 
   /* If tag starts with ZH, it's Chinese */
   if ((tag & 0xFFFF0000)  == 0x5A480000) {
     switch (tag) {
-      case HB_TAG('Z','H','H',' '): return hb_language_from_string ("zh-hk"); /* Hong Kong */
+      case HB_TAG('Z','H','H',' '): return hb_language_from_string ("zh-hk", -1); /* Hong Kong */
       default: {
         /* Encode the tag... */
 	unsigned char buf[14] = "zh-x-hbot";
@@ -681,7 +688,7 @@ hb_ot_tag_to_language (hb_tag_t tag)
 	if (buf[12] == 0x20)
 	  buf[12] = '\0';
 	buf[13] = '\0';
-	return hb_language_from_string ((char *) buf);
+	return hb_language_from_string ((char *) buf, -1);
       }
     }
   }
@@ -696,9 +703,8 @@ hb_ot_tag_to_language (hb_tag_t tag)
     if (buf[9] == 0x20)
       buf[9] = '\0';
     buf[10] = '\0';
-    return hb_language_from_string ((char *) buf);
+    return hb_language_from_string ((char *) buf, -1);
   }
 }
 
 
-HB_END_DECLS

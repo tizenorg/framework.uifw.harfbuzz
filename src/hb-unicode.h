@@ -28,6 +28,10 @@
  * Google Author(s): Behdad Esfahbod
  */
 
+#ifndef HB_H_IN
+#error "Include <hb.h> instead."
+#endif
+
 #ifndef HB_UNICODE_H
 #define HB_UNICODE_H
 
@@ -66,8 +70,8 @@ hb_bool_t
 hb_unicode_funcs_set_user_data (hb_unicode_funcs_t *ufuncs,
 			        hb_user_data_key_t *key,
 			        void *              data,
-			        hb_destroy_func_t   destroy);
-
+			        hb_destroy_func_t   destroy,
+			        hb_bool_t           replace);
 
 void *
 hb_unicode_funcs_get_user_data (hb_unicode_funcs_t *ufuncs,

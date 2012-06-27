@@ -31,28 +31,14 @@
 
 #include <string.h>
 
-HB_BEGIN_DECLS
 
 
 #ifndef HB_DEBUG_BUFFER
 #define HB_DEBUG_BUFFER (HB_DEBUG+0)
 #endif
 
-
-static hb_buffer_t _hb_buffer_nil = {
-  HB_OBJECT_HEADER_STATIC,
-
-  &_hb_unicode_funcs_default,
-  {
-    HB_DIRECTION_INVALID,
-    HB_SCRIPT_INVALID,
-    NULL,
-  },
-
-  TRUE, /* in_error */
-  TRUE, /* have_output */
-  TRUE  /* have_positions */
-};
+#define _HB_BUFFER_UNICODE_FUNCS_DEFAULT (const_cast<hb_unicode_funcs_t *> (&_hb_unicode_funcs_default))
+#define _HB_BUFFER_PROPS_DEFAULT { HB_DIRECTION_INVALID, HB_SCRIPT_INVALID, HB_LANGUAGE_INVALID }
 
 /* Here is how the buffer works internally:
  *
@@ -80,7 +66,7 @@ bool
 hb_buffer_t::enlarge (unsigned int size)
 {
   if (unlikely (in_error))
-    return FALSE;
+    return false;
 
   unsigned int new_allocated = allocated;
   hb_glyph_position_t *new_pos = NULL;
@@ -102,7 +88,7 @@ hb_buffer_t::enlarge (unsigned int size)
 
 done:
   if (unlikely (!new_pos || !new_info))
-    in_error = TRUE;
+    in_error = true;
 
   if (likely (new_pos))
     pos = new_pos;
@@ -121,7 +107,7 @@ bool
 hb_buffer_t::make_room_for (unsigned int num_in,
 			    unsigned int num_out)
 {
-  if (unlikely (!ensure (out_len + num_out))) return FALSE;
+  if (unlikely (!ensure (out_len + num_out))) return false;
 
   if (out_info == info &&
       out_len + num_out > idx + num_in)
@@ -132,7 +118,17 @@ hb_buffer_t::make_room_for (unsigned int num_in,
     memcpy (out_info, info, out_len * sizeof (out_info[0]));
   }
 
-  return TRUE;
+  return true;
+}
+
+void *
+hb_buffer_t::get_scratch_buffer (unsigned int *size)
+{
+  have_output = false;
+  have_positions = false;
+  out_len = 0;
+  *size = allocated * sizeof (pos[0]);
+  return pos;
 }
 
 
@@ -145,13 +141,14 @@ hb_buffer_t::reset (void)
     return;
 
   hb_unicode_funcs_destroy (unicode);
-  unicode = _hb_buffer_nil.unicode;
+  unicode = _HB_BUFFER_UNICODE_FUNCS_DEFAULT;
 
-  props = _hb_buffer_nil.props;
+  hb_segment_properties_t default_props = _HB_BUFFER_PROPS_DEFAULT;
+  props = default_props;
 
-  in_error = FALSE;
-  have_output = FALSE;
-  have_positions = FALSE;
+  in_error = false;
+  have_output = false;
+  have_positions = false;
 
   idx = 0;
   len = 0;
@@ -189,8 +186,8 @@ hb_buffer_t::clear_output (void)
   if (unlikely (hb_object_is_inert (this)))
     return;
 
-  have_output = TRUE;
-  have_positions = FALSE;
+  have_output = true;
+  have_positions = false;
 
   out_len = 0;
   out_info = info;
@@ -202,8 +199,8 @@ hb_buffer_t::clear_positions (void)
   if (unlikely (hb_object_is_inert (this)))
     return;
 
-  have_output = FALSE;
-  have_positions = TRUE;
+  have_output = false;
+  have_positions = true;
 
   memset (pos, 0, sizeof (pos[0]) * len);
 }
@@ -214,6 +211,7 @@ hb_buffer_t::swap_buffers (void)
   if (unlikely (in_error)) return;
 
   assert (have_output);
+  have_output = false;
 
   if (out_info != info)
   {
@@ -259,6 +257,32 @@ hb_buffer_t::replace_glyphs_be16 (unsigned int num_in,
 }
 
 void
+hb_buffer_t::replace_glyphs (unsigned int num_in,
+			     unsigned int num_out,
+			     const uint32_t *glyph_data)
+{
+  if (!make_room_for (num_in, num_out)) return;
+
+  hb_glyph_info_t orig_info = info[idx];
+  for (unsigned int i = 1; i < num_in; i++)
+  {
+    hb_glyph_info_t *inf = &info[idx + i];
+    orig_info.cluster = MIN (orig_info.cluster, inf->cluster);
+  }
+
+  hb_glyph_info_t *pinfo = &out_info[out_len];
+  for (unsigned int i = 0; i < num_out; i++)
+  {
+    *pinfo = orig_info;
+    pinfo->codepoint = glyph_data[i];
+    pinfo++;
+  }
+
+  idx  += num_in;
+  out_len += num_out;
+}
+
+void
 hb_buffer_t::output_glyph (hb_codepoint_t glyph_index)
 {
   if (!make_room_for (0, 1)) return;
@@ -282,6 +306,8 @@ hb_buffer_t::copy_glyph (void)
 void
 hb_buffer_t::replace_glyph (hb_codepoint_t glyph_index)
 {
+  if (!make_room_for (1, 1)) return;
+
   out_info[out_len] = info[idx];
   out_info[out_len].codepoint = glyph_index;
 
@@ -393,6 +419,58 @@ hb_buffer_t::reverse_clusters (void)
   reverse_range (start, i);
 }
 
+void
+hb_buffer_t::merge_clusters (unsigned int start,
+			     unsigned int end)
+{
+  unsigned int cluster = this->info[start].cluster;
+
+  for (unsigned int i = start + 1; i < end; i++)
+    cluster = MIN (cluster, this->info[i].cluster);
+  for (unsigned int i = start; i < end; i++)
+    this->info[i].cluster = cluster;
+}
+void
+hb_buffer_t::merge_out_clusters (unsigned int start,
+				 unsigned int end)
+{
+  unsigned int cluster = this->out_info[start].cluster;
+
+  for (unsigned int i = start + 1; i < end; i++)
+    cluster = MIN (cluster, this->out_info[i].cluster);
+  for (unsigned int i = start; i < end; i++)
+    this->out_info[i].cluster = cluster;
+}
+
+void
+hb_buffer_t::guess_properties (void)
+{
+  /* If script is set to INVALID, guess from buffer contents */
+  if (props.script == HB_SCRIPT_INVALID) {
+    for (unsigned int i = 0; i < len; i++) {
+      hb_script_t script = hb_unicode_script (unicode, info[i].codepoint);
+      if (likely (script != HB_SCRIPT_COMMON &&
+		  script != HB_SCRIPT_INHERITED &&
+		  script != HB_SCRIPT_UNKNOWN)) {
+        props.script = script;
+        break;
+      }
+    }
+  }
+
+  /* If direction is set to INVALID, guess from script */
+  if (props.direction == HB_DIRECTION_INVALID) {
+    props.direction = hb_script_get_horizontal_direction (props.script);
+  }
+
+  /* If language is not set, use default language from locale */
+  if (props.language == HB_LANGUAGE_INVALID) {
+    /* TODO get_default_for_script? using $LANGUAGE */
+    props.language = hb_language_get_default ();
+  }
+}
+
+
 static inline void
 dump_var_allocation (const hb_buffer_t *buffer)
 {
@@ -448,19 +526,14 @@ void hb_buffer_t::deallocate_var_all (void)
 /* Public API */
 
 hb_buffer_t *
-hb_buffer_create (unsigned int pre_alloc_size)
+hb_buffer_create ()
 {
   hb_buffer_t *buffer;
 
   if (!(buffer = hb_object_create<hb_buffer_t> ()))
-    return &_hb_buffer_nil;
+    return hb_buffer_get_empty ();
 
   buffer->reset ();
-
-  if (pre_alloc_size && !buffer->ensure (pre_alloc_size)) {
-    hb_buffer_destroy (buffer);
-    return &_hb_buffer_nil;
-  }
 
   return buffer;
 }
@@ -468,7 +541,18 @@ hb_buffer_create (unsigned int pre_alloc_size)
 hb_buffer_t *
 hb_buffer_get_empty (void)
 {
-  return &_hb_buffer_nil;
+  static const hb_buffer_t _hb_buffer_nil = {
+    HB_OBJECT_HEADER_STATIC,
+
+    _HB_BUFFER_UNICODE_FUNCS_DEFAULT,
+    _HB_BUFFER_PROPS_DEFAULT,
+
+    true, /* in_error */
+    true, /* have_output */
+    true  /* have_positions */
+  };
+
+  return const_cast<hb_buffer_t *> (&_hb_buffer_nil);
 }
 
 hb_buffer_t *
@@ -494,9 +578,10 @@ hb_bool_t
 hb_buffer_set_user_data (hb_buffer_t        *buffer,
 			 hb_user_data_key_t *key,
 			 void *              data,
-			 hb_destroy_func_t   destroy)
+			 hb_destroy_func_t   destroy,
+			 hb_bool_t           replace)
 {
-  return hb_object_set_user_data (buffer, key, data, destroy);
+  return hb_object_set_user_data (buffer, key, data, destroy, replace);
 }
 
 void *
@@ -515,7 +600,7 @@ hb_buffer_set_unicode_funcs (hb_buffer_t        *buffer,
     return;
 
   if (!unicode)
-    unicode = _hb_buffer_nil.unicode;
+    unicode = _HB_BUFFER_UNICODE_FUNCS_DEFAULT;
 
   hb_unicode_funcs_reference (unicode);
   hb_unicode_funcs_destroy (buffer->unicode);
@@ -609,8 +694,11 @@ hb_bool_t
 hb_buffer_set_length (hb_buffer_t  *buffer,
 		      unsigned int  length)
 {
+  if (unlikely (hb_object_is_inert (buffer)))
+    return length == 0;
+
   if (!buffer->ensure (length))
-    return FALSE;
+    return false;
 
   /* Wipe the new space */
   if (length > buffer->len) {
@@ -620,7 +708,7 @@ hb_buffer_set_length (hb_buffer_t  *buffer,
   }
 
   buffer->len = length;
-  return TRUE;
+  return true;
 }
 
 unsigned int
@@ -666,8 +754,25 @@ hb_buffer_reverse_clusters (hb_buffer_t *buffer)
   buffer->reverse_clusters ();
 }
 
+void
+hb_buffer_guess_properties (hb_buffer_t *buffer)
+{
+  buffer->guess_properties ();
+}
+
 #define ADD_UTF(T) \
 	HB_STMT_START { \
+	  if (text_length == -1) { \
+	    text_length = 0; \
+	    const T *p = (const T *) text; \
+	    while (*p) { \
+	      text_length++; \
+	      p++; \
+	    } \
+	  } \
+	  if (item_length == -1) \
+	    item_length = text_length - item_offset; \
+	  buffer->ensure (buffer->len + item_length * sizeof (T) / 4); \
 	  const T *next = (const T *) text + item_offset; \
 	  const T *end = next + item_length; \
 	  while (next < end) { \
@@ -722,9 +827,9 @@ hb_utf8_next (const uint8_t *text,
 void
 hb_buffer_add_utf8 (hb_buffer_t  *buffer,
 		    const char   *text,
-		    unsigned int  text_length HB_UNUSED,
+		    int           text_length,
 		    unsigned int  item_offset,
-		    unsigned int  item_length)
+		    int           item_length)
 {
 #define UTF_NEXT(S, E, U)	hb_utf8_next (S, E, &(U))
   ADD_UTF (uint8_t);
@@ -756,9 +861,9 @@ hb_utf16_next (const uint16_t *text,
 void
 hb_buffer_add_utf16 (hb_buffer_t    *buffer,
 		     const uint16_t *text,
-		     unsigned int    text_length HB_UNUSED,
+		     int             text_length,
 		     unsigned int    item_offset,
-		     unsigned int    item_length)
+		     int            item_length)
 {
 #define UTF_NEXT(S, E, U)	hb_utf16_next (S, E, &(U))
   ADD_UTF (uint16_t);
@@ -768,9 +873,9 @@ hb_buffer_add_utf16 (hb_buffer_t    *buffer,
 void
 hb_buffer_add_utf32 (hb_buffer_t    *buffer,
 		     const uint32_t *text,
-		     unsigned int    text_length HB_UNUSED,
+		     int             text_length,
 		     unsigned int    item_offset,
-		     unsigned int    item_length)
+		     int             item_length)
 {
 #define UTF_NEXT(S, E, U)	((U) = *(S), (S)+1)
   ADD_UTF (uint32_t);
@@ -778,4 +883,3 @@ hb_buffer_add_utf32 (hb_buffer_t    *buffer,
 }
 
 
-HB_END_DECLS

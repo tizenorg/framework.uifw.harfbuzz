@@ -36,9 +36,8 @@
 #include <unicode/uversion.h>
 #include <unicode/uchar.h>
 #include <unicode/unorm.h>
-#include <unicode/unistr.h>
+#include <unicode/ustring.h>
 
-HB_BEGIN_DECLS
 
 
 hb_script_t
@@ -47,7 +46,7 @@ hb_icu_script_to_script (UScriptCode script)
   if (unlikely (script == USCRIPT_INVALID_CODE))
     return HB_SCRIPT_INVALID;
 
-  return hb_script_from_string (uscript_getShortName (script));
+  return hb_script_from_string (uscript_getShortName (script), -1);
 }
 
 UScriptCode
@@ -159,7 +158,7 @@ hb_icu_unicode_script (hb_unicode_funcs_t *ufuncs HB_UNUSED,
   UErrorCode status = U_ZERO_ERROR;
   UScriptCode scriptCode = uscript_getScript(unicode, &status);
 
-  if (unlikely (status != U_ZERO_ERROR))
+  if (unlikely (U_FAILURE (status)))
     return HB_SCRIPT_UNKNOWN;
 
   return hb_icu_script_to_script (scriptCode);
@@ -173,30 +172,29 @@ hb_icu_unicode_compose (hb_unicode_funcs_t *ufuncs HB_UNUSED,
 			void               *user_data HB_UNUSED)
 {
   if (!a || !b)
-    return FALSE;
+    return false;
 
   UChar utf16[4], normalized[5];
-  gint len;
+  int len;
   hb_bool_t ret, err;
   UErrorCode icu_err;
 
   len = 0;
-  err = FALSE;
+  err = false;
   U16_APPEND (utf16, len, ARRAY_LENGTH (utf16), a, err);
-  if (err) return FALSE;
+  if (err) return false;
   U16_APPEND (utf16, len, ARRAY_LENGTH (utf16), b, err);
-  if (err) return FALSE;
+  if (err) return false;
 
   icu_err = U_ZERO_ERROR;
   len = unorm_normalize (utf16, len, UNORM_NFC, 0, normalized, ARRAY_LENGTH (normalized), &icu_err);
-  if (icu_err)
-    return FALSE;
-  normalized[len] = 0;
-  if (u_strlen (normalized) == 1) {
+  if (U_FAILURE (icu_err))
+    return false;
+  if (u_countChar32 (normalized, len) == 1) {
     U16_GET_UNSAFE (normalized, 0, *ab);
-    ret = TRUE;
+    ret = true;
   } else {
-    ret = FALSE;
+    ret = false;
   }
 
   return ret;
@@ -210,7 +208,7 @@ hb_icu_unicode_decompose (hb_unicode_funcs_t *ufuncs HB_UNUSED,
 			  void               *user_data HB_UNUSED)
 {
   UChar utf16[2], normalized[20];
-  gint len;
+  int len;
   hb_bool_t ret, err;
   UErrorCode icu_err;
 
@@ -219,17 +217,16 @@ hb_icu_unicode_decompose (hb_unicode_funcs_t *ufuncs HB_UNUSED,
   /* Watchout for the dragons.  Err, watchout for macros changing len. */
 
   len = 0;
-  err = FALSE;
+  err = false;
   U16_APPEND (utf16, len, ARRAY_LENGTH (utf16), ab, err);
-  if (err) return FALSE;
+  if (err) return false;
 
   icu_err = U_ZERO_ERROR;
   len = unorm_normalize (utf16, len, UNORM_NFD, 0, normalized, ARRAY_LENGTH (normalized), &icu_err);
-  if (icu_err)
-    return FALSE;
+  if (U_FAILURE (icu_err))
+    return false;
 
-  normalized[len] = 0;
-  len = u_strlen (normalized);
+  len = u_countChar32 (normalized, len);
 
   if (len == 1) {
     U16_GET_UNSAFE (normalized, 0, *a);
@@ -246,15 +243,15 @@ hb_icu_unicode_decompose (hb_unicode_funcs_t *ufuncs HB_UNUSED,
     UChar recomposed[20];
     icu_err = U_ZERO_ERROR;
     unorm_normalize (normalized, len, UNORM_NFC, 0, recomposed, ARRAY_LENGTH (recomposed), &icu_err);
-    if (icu_err)
-      return FALSE;
+    if (U_FAILURE (icu_err))
+      return false;
     hb_codepoint_t c;
     U16_GET_UNSAFE (recomposed, 0, c);
     if (c != *a && c != ab) {
       *a = c;
       *b = 0;
     }
-    ret = TRUE;
+    ret = true;
   } else {
     /* If decomposed to more than two characters, take the last one,
      * and recompose the rest to get the first component. */
@@ -262,22 +259,23 @@ hb_icu_unicode_decompose (hb_unicode_funcs_t *ufuncs HB_UNUSED,
     UChar recomposed[20];
     icu_err = U_ZERO_ERROR;
     len = unorm_normalize (normalized, len, UNORM_NFC, 0, recomposed, ARRAY_LENGTH (recomposed), &icu_err);
-    if (icu_err)
-      return FALSE;
+    if (U_FAILURE (icu_err))
+      return false;
     /* We expect that recomposed has exactly one character now. */
     U16_GET_UNSAFE (recomposed, 0, *a);
-    ret = TRUE;
+    ret = true;
   }
 
   return ret;
 }
 
-extern HB_INTERNAL hb_unicode_funcs_t _hb_unicode_funcs_icu;
-hb_unicode_funcs_t _hb_icu_unicode_funcs = {
+
+extern HB_INTERNAL const hb_unicode_funcs_t _hb_icu_unicode_funcs;
+const hb_unicode_funcs_t _hb_icu_unicode_funcs = {
   HB_OBJECT_HEADER_STATIC,
 
   NULL, /* parent */
-  TRUE, /* immutable */
+  true, /* immutable */
   {
 #define HB_UNICODE_FUNC_IMPLEMENT(name) hb_icu_unicode_##name,
     HB_UNICODE_FUNCS_IMPLEMENT_CALLBACKS
@@ -288,8 +286,7 @@ hb_unicode_funcs_t _hb_icu_unicode_funcs = {
 hb_unicode_funcs_t *
 hb_icu_get_unicode_funcs (void)
 {
-  return &_hb_icu_unicode_funcs;
+  return const_cast<hb_unicode_funcs_t *> (&_hb_icu_unicode_funcs);
 }
 
 
-HB_END_DECLS

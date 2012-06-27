@@ -2,7 +2,7 @@
 
 NULL =
 
-SUBDIRS = src test
+SUBDIRS = src util test
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = harfbuzz.pc

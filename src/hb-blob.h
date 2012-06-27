@@ -24,6 +24,10 @@
  * Red Hat Author(s): Behdad Esfahbod
  */
 
+#ifndef HB_H_IN
+#error "Include <hb.h> instead."
+#endif
+
 #ifndef HB_BLOB_H
 #define HB_BLOB_H
 
@@ -66,7 +70,8 @@ hb_bool_t
 hb_blob_set_user_data (hb_blob_t          *blob,
 		       hb_user_data_key_t *key,
 		       void *              data,
-		       hb_destroy_func_t   destroy);
+		       hb_destroy_func_t   destroy,
+		       hb_bool_t           replace);
 
 
 void *

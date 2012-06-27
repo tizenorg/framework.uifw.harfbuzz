@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011  Google, Inc.
+ * Copyright © 2011,2012  Google, Inc.
  *
  *  This is part of HarfBuzz, a text shaping library.
  *
@@ -53,62 +53,58 @@ SM   = 9;
 VD   = 10;
 A    = 11;
 NBSP = 12;
+DOTTEDCIRCLE = 13;
 
 c = C | Ra;
+n = N N?;
 z = ZWJ|ZWNJ;
 matra_group = M N? H?;
 syllable_tail = SM? (VD VD?)?;
+place_holder = NBSP | DOTTEDCIRCLE;
 
-action found_consonant_syllable { found_consonant_syllable (map, buffer, mask_array, last, p); }
-action found_vowel_syllable { found_vowel_syllable (map, buffer, mask_array, last, p); }
-action found_standalone_cluster { found_standalone_cluster (map, buffer, mask_array, last, p); }
-action found_non_indic { found_non_indic (map, buffer, mask_array, last, p); }
 
-action next_syllable { set_cluster (buffer, p, last); last = p; }
+consonant_syllable =	(c.n? (H.z?|z.H))* c.n? A? (H.z? | matra_group*)? syllable_tail;
+vowel_syllable =	(Ra H)? V n? (z?.H.c | ZWJ.c)* matra_group* syllable_tail;
+standalone_cluster =	(Ra H)? place_holder n? (z? H c)* matra_group* syllable_tail;
+other =			any;
 
-consonant_syllable =	(c.N? (z.H|H.z?))* c.N? A? (H.z? | matra_group*)? syllable_tail %(found_consonant_syllable);
-vowel_syllable =	(Ra H)? V N? (z.H.c | ZWJ.c)? matra_group* syllable_tail %(found_vowel_syllable);
-standalone_cluster =	(Ra H)? NBSP N? (z? H c)? matra_group* syllable_tail %(found_standalone_cluster);
-non_indic = X %(found_non_indic);
+main := |*
+	consonant_syllable	=> { process_syllable (consonant_syllable); };
+	vowel_syllable		=> { process_syllable (vowel_syllable); };
+	standalone_cluster	=> { process_syllable (standalone_cluster); };
+	other			=> { process_syllable (non_indic); };
+*|;
 
-syllable =
-	  consonant_syllable
-	| vowel_syllable
-	| standalone_cluster
-	| non_indic
-	;
-
-main := (syllable %(next_syllable))**;
 
 }%%
 
-
-static void
-set_cluster (hb_buffer_t *buffer,
-	     unsigned int start, unsigned int end)
-{
-  unsigned int cluster = buffer->info[start].cluster;
-
-  for (unsigned int i = start + 1; i < end; i++)
-    cluster = MIN (cluster, buffer->info[i].cluster);
-  for (unsigned int i = start; i < end; i++)
-    buffer->info[i].cluster = cluster;
-}
+#define process_syllable(func) \
+  HB_STMT_START { \
+    /* fprintf (stderr, "syllable %d..%d %s\n", last, p+1, #func); */ \
+    for (unsigned int i = last; i < p+1; i++) \
+      info[i].syllable() = syllable_serial; \
+    PASTE (initial_reordering_, func) (map, buffer, mask_array, last, p+1); \
+    last = p+1; \
+    syllable_serial++; \
+    if (unlikely (!syllable_serial)) syllable_serial++; \
+  } HB_STMT_END
 
 static void
 find_syllables (const hb_ot_map_t *map, hb_buffer_t *buffer, hb_mask_t *mask_array)
 {
-  unsigned int p, pe, eof;
+  unsigned int p, pe, eof, ts, te, act;
   int cs;
+  hb_glyph_info_t *info = buffer->info;
   %%{
     write init;
-    getkey buffer->info[p].indic_category();
+    getkey info[p].indic_category();
   }%%
 
   p = 0;
   pe = eof = buffer->len;
 
   unsigned int last = 0;
+  uint8_t syllable_serial = 1;
   %%{
     write exec;
   }%%

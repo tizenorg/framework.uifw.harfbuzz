@@ -1,6 +1,6 @@
 Name:           harfbuzz
 Summary:        Hindi Reshaping Library
-Version:        0.7.0
+Version:        0.9.0
 Release:        1
 Group:          TO_BE/FILLED_IN
 License:        TO BE FILLED IN
