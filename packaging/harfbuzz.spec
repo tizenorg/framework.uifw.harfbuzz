@@ -45,6 +45,7 @@ cp %{_builddir}/%{buildsubdir}/COPYING %{buildroot}/usr/share/license/%{name}
 
 
 %files
+%manifest harfbuzz.manifest
 %defattr(-,root,root,-)
 %{_libdir}/lib*.so.*
 %{_bindir}/hb-ot-shape-closure
