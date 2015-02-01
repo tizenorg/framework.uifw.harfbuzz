@@ -2,4 +2,9 @@
 	<request>
 		<domain name="_"/>
 	</request>
+	<assign>
+		<filesystem path="/usr/bin/hb-ot-shape-closure" exec_label="none" />
+		<filesystem path="/usr/bin/hb-shape" exec_label="none" />
+		<filesystem path="/usr/bin/hb-view" exec_label="none" />
+	</assign>
 </manifest>

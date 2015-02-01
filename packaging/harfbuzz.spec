@@ -2,11 +2,10 @@ Name:           harfbuzz
 Summary:        Hindi Reshaping Library
 Version:        0.9.7
 Release:        1
-VCS:            framework/uifw/harfbuzz#submit/master/20121129.061621-1-g0ecb9965bc830ef740947d8153ffb29fe4eea580
 Group:          TO_BE/FILLED_IN
-License:        MIT
+License:        TO BE FILLED IN
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  pkgconfig(cairo)
+#BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(icu-i18n)
@@ -31,13 +30,12 @@ Development files for %{name}
 %setup -q 
 
 
-
-
 %build
+%autogen
 export CXXFLAGS+=" -fdata-sections -ffunction-sections -Wl,--gc-sections"
 export CFLAGS+=" -fdata-sections -ffunction-sections -Wl,--gc-sections"
+%configure
 
-%autogen
 make %{?jobs:-j%jobs}
 
 
@@ -49,12 +47,12 @@ cp %{_builddir}/%{buildsubdir}/COPYING %{buildroot}/usr/share/license/%{name}
 
 
 %files
-%manifest harfbuzz.manifest
 %defattr(-,root,root,-)
 %{_libdir}/lib*.so.*
-%{_bindir}/hb-ot-shape-closure
-%{_bindir}/hb-shape
-%{_bindir}/hb-view
+#%{_bindir}/hb-ot-shape-closure
+#%{_bindir}/hb-shape
+#%{_bindir}/hb-view
+%manifest %{name}.manifest
 /usr/share/license/%{name}
 
 
