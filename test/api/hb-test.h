@@ -33,6 +33,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 HB_BEGIN_DECLS
 
@@ -75,7 +76,6 @@ srcdir (void)
 static inline void
 hb_test_init (int *argc, char ***argv)
 {
-  g_thread_init (NULL);
   g_test_init (argc, argv, NULL);
 }
 

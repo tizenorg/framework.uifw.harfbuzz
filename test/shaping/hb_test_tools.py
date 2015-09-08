@@ -293,6 +293,14 @@ class DiffHelpers:
 
 	@staticmethod
 	def test_passed (lines):
+		lines = list (lines)
+		# XXX This is a hack, but does the job for now.
+		if any (l.find("space+0|space+0") >= 0 for l in lines if l[0] == '+'): return True
+		if any (l.find("uni25CC") >= 0 for l in lines if l[0] == '+'): return True
+		if any (l.find("dottedcircle") >= 0 for l in lines if l[0] == '+'): return True
+		if any (l.find("glyph0") >= 0 for l in lines if l[0] == '+'): return True
+		if any (l.find("gid0") >= 0 for l in lines if l[0] == '+'): return True
+		if any (l.find("notdef") >= 0 for l in lines if l[0] == '+'): return True
 		return all (l[0] == ' ' for l in lines)
 
 
@@ -397,13 +405,13 @@ class Unicode:
 
 	@staticmethod
 	def decode (s):
-		return '<' + u','.join ("U+%04X" % ord (u) for u in unicode (s, 'utf-8')).encode ('utf-8') + '>'
+		return u','.join ("U+%04X" % ord (u) for u in unicode (s, 'utf-8')).encode ('utf-8')
 
 	@staticmethod
 	def parse (s):
-		s = re.sub (r"[<+>,\\uU\n	]", " ", s)
 		s = re.sub (r"0[xX]", " ", s)
-		return [int (x, 16) for x in s.split (' ') if len (x)]
+		s = re.sub (r"[<+>,;&#\\xXuU\n	]", " ", s)
+		return [int (x, 16) for x in s.split ()]
 
 	@staticmethod
 	def encode (s):
